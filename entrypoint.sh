@@ -1,3 +1,3 @@
-#!/bin/bash
+#/!bin/bash
 
-source git/*.sh
+source $(dirname $BASH_SOURCE)/git/*.sh
