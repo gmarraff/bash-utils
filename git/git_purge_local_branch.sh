@@ -4,6 +4,7 @@ source $(dirname $BASH_SOURCE)/../utils/user_confirm.sh
 
 # Prune the branches deleted on the remote and then remove them
 # from the local git repository, after asking for confirmation.
+# NOTE: it only removes tracked branches.
 git_purge_local_branches() {
     if ! git rev-parse --is-inside-work-tree >/dev/null; then
         return
