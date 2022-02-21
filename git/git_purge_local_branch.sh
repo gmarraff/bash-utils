@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Prune the branches deleted on the remote and then remove them
 # from the local git repository, after asking for confirmation.
 git_purge_local_branches() {

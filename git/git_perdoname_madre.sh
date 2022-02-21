@@ -1,3 +1,5 @@
+#!/bin/bash
+
 git_perdoname_madre_forced() {
     git add .
     git commit --amend --no-edit
