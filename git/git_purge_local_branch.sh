@@ -10,7 +10,7 @@ git_purge_local_branches() {
         return
     fi
     git remote prune origin
-    gone_branches=$(git branch -v | grep -F [gone] | awk '{print $1}')
+    gone_branches=$(git branch -v | grep -F [gone] | grep -v "*" | awk '{print $1}')
     if [ -z "$gone_branches" ]; then
         echo "No local branches to delete found."
     else
