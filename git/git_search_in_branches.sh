@@ -21,7 +21,7 @@ git_search_in_branches() {
         return
     fi
 
-    pathspec="-- .*"
+    pathspec=""
     if [[ "$path" != "" ]]; then
         pathspec="-- $path"
     fi
