@@ -3,6 +3,7 @@
 WORKDIR=$(dirname $BASH_SOURCE)
 DIRECTORIES="
 git
+kubectl
 "
 
 for dir in $DIRECTORIES; do
