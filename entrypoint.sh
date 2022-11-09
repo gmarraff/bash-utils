@@ -4,6 +4,7 @@ WORKDIR=$(dirname $BASH_SOURCE)
 DIRECTORIES="
 git
 kubectl
+mark
 "
 
 for dir in $DIRECTORIES; do
