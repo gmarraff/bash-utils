@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if ! which grip; then
+    if which pip3; then
+        pip3 install grip;
+    else
+        pip install grip
+    fi
+fi
+
+GRIP=$(which grip)
+GRIP_PORT=5069
+GRIP_RUNNING_PID=$(ps f | grep "grip" | grep ${GRIP_PORT} | grep -v grep | cut -d " " -f 3)
+GRIP_COMMAND="$GRIP -b ${1} ${GRIP_PORT}"
+
+if [[ ! -z $GRIP_RUNNING_PID ]]; then
+    kill -SIGTERM $GRIP_RUNNING_PID
+fi
+
+$GRIP_COMMAND 2>/tmp/grip.log 1>/tmp/grip.log &
+firefox http://localhost:$GRIP_PORT

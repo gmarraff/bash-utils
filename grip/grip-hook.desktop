@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=4
+Name=Grip Hook
+Comment=Markdown Viewer
+Exec=grip-hook %f
+Icon=/usr/share/icons/markdown.png
+Terminal=false
+Type=Application
+Mimetype=text/markdown;text/x-markdown;
+Categories=Utility;Development;
