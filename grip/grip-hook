@@ -10,7 +10,7 @@ fi
 
 GRIP=$(which grip)
 GRIP_PORT=5069
-GRIP_RUNNING_PID=$(ps f | grep "grip" | grep ${GRIP_PORT} | grep -v grep | cut -d " " -f 3)
+GRIP_RUNNING_PID=$(ps x | grep "grip" | grep ${GRIP_PORT} | grep -v grep | cut -d " " -f 3)
 GRIP_COMMAND="$GRIP -b ${1} ${GRIP_PORT}"
 
 if [[ ! -z $GRIP_RUNNING_PID ]]; then
@@ -18,4 +18,3 @@ if [[ ! -z $GRIP_RUNNING_PID ]]; then
 fi
 
 $GRIP_COMMAND 2>/tmp/grip.log 1>/tmp/grip.log &
-firefox http://localhost:$GRIP_PORT
