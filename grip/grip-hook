@@ -2,9 +2,9 @@
 
 set -e
 
-if ! which grip; then
-    if which pip3; then
-        pip3 install grip;
+if ! which grip 2>/dev/null 1>/dev/null; then
+    if which pip3 2>/dev/null 1>/dev/null; then
+        pip3 install grip
     else
         pip install grip
     fi
