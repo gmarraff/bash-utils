@@ -2,6 +2,7 @@
 
 WORKDIR=$(dirname $BASH_SOURCE)
 DIRECTORIES="
+bins
 git
 kubectl
 mark

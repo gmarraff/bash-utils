@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+import argparse
+import random
+import time
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Select a random item in a fancy way")
+
+    parser.add_argument("-i", "--items", nargs="+", help="Items to select", required=True)
+    parser.add_argument("-s", "--seconds", type=int, help="Number of second of rolling (default 10)", default=10)
+
+    args = parser.parse_args()
+
+    items = args.items
+    seconds = args.seconds
+    longest_name_len = len(max(items, key=len))
+
+    random.shuffle(items)
+    for _ in range(0, seconds):
+        item = random.choice(items)
+        spaces = " " * (longest_name_len-len(item))
+        print(f"{item}{spaces}", end="\r")
+        time.sleep(0.5)
+        print(" "*longest_name_len, end="\r")
+        time.sleep(0.5)
+    print(item)
+
+if __name__=="__main__":
+    main()
