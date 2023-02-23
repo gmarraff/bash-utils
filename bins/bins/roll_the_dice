@@ -18,8 +18,10 @@ def main():
     longest_name_len = len(max(items, key=len))
 
     random.seed(time.time())
-    for i in range(0, random.randint(0,10)):
-        random.seed(f"{time.time()}{i}")
+    seeder = list(range(0, random.randint(0,100)))
+    random.shuffle(seeder)
+    for i in seeder:
+        random.seed(f"{i}{time.time()}{i}")
 
     random.shuffle(items)
     for _ in range(0, seconds):
