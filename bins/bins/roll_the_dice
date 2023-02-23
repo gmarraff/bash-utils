@@ -21,7 +21,9 @@ def main():
     seeder = list(range(0, random.randint(0,100)))
     random.shuffle(seeder)
     for i in seeder:
-        random.seed(f"{i}{time.time()}{i}")
+        time_seeder = [*f"{i}{time.time()}{i}"]
+        random.shuffle(time_seeder)
+        random.seed("".join(time_seeder))
 
     random.shuffle(items)
     for _ in range(0, seconds):
