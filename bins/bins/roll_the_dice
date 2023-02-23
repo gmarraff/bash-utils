@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import os
 import random
 import time
 
@@ -17,13 +18,7 @@ def main():
     seconds = args.seconds
     longest_name_len = len(max(items, key=len))
 
-    random.seed(time.time())
-    seeder = list(range(0, random.randint(0,100)))
-    random.shuffle(seeder)
-    for i in seeder:
-        time_seeder = [*f"{i}{time.time()}{i}"]
-        random.shuffle(time_seeder)
-        random.seed("".join(time_seeder))
+    random.seed(os.urandom(128))
 
     random.shuffle(items)
     for _ in range(0, seconds):
