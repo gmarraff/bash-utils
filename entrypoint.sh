@@ -6,6 +6,7 @@ bins
 git
 kubectl
 mark
+misc
 "
 
 for dir in $DIRECTORIES; do
