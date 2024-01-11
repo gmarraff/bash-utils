@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+
+import argparse
+import time
+
+from dataclasses import dataclass
+from typing import List
+
+TMP_BRANCH_NAME=f"tmpbranch-{time.time_ns()}"
+TMP_REMOTE_NAME=f"tmpremote-{time.time_ns()}"
+
+@dataclass
+class Config:
+    source_repo: str
+    source_branch: str
+    dest_repo: str
+    dest_branch: str
+    source_dir: str = ""
+    dest_dir: str = ""
+
+def prepare_repositories(cfg: Config):
+    pass
+
+def create_branch_with_subtree(cfg: Config):
+    pass
+
+def cleanup(cfg: Config):
+    pass
+
+def merge_branch_into_another_repo(cfg: Config) -> List[str]:
+    return [
+        f"cd {cfg.dest_repo}",
+        f"git checkout main",
+        f"git pull",
+        f"git checkout -b {cfg.dest_branch}",
+        f"git remote add -f {TMP_REMOTE_NAME} {cfg.source_repo}",
+        f"git merge -s ours --no-commit {TMP_REMOTE_NAME}/{cfg.source_branch} --allow-unrelated-histories",
+        f"git read-tree --prefix=$DEST_DIR -u {TMP_REMOTE_NAME}/{cfg.source_branch}:",
+        f"git remote remove {TMP_REMOTE_NAME}",
+        "git commit",
+    ]
+
+def cli():
+    parser = argparse.ArgumentParser(
+        "git_subtree_helper",
+        description="Helper for merging a whole or partial repository and their history in another one.",
+    )
+    parser.add_argument("--source-repo", type=str, required=True)
+    parser.add_argument("--source-branch", type=str, required=True)
+    parser.add_argument("--source-dir", type=str, default="")
+    parser.add_argument("--dest-repo", type=str, required=True)
+    parser.add_argument("--dest-branch", type=str, required=True)
+    parser.add_argument("--dest-dir", type=str, default="")
+
+    args = parser.parse_args()
+    cfg = Config(**args)
+
+    prepare_repositories(cfg)
+
+    cmd: List[str] = list()
+    if cfg.source_dir:
+        cmd += create_branch_with_subtree(cfg)
+    cmd += merge_branch_into_another_repo(cfg)
+
+    cleanup(cfg)
+
+
+
+
+if __name__ == "__main__":
+    cli()
