@@ -80,7 +80,19 @@ def merge_branch_into_another_repo(cfg: Config) -> List[str]:
 def cli():
     parser = argparse.ArgumentParser(
         "git_subtree_helper",
-        description="Helper for merging a whole or partial repository and their history in another one.",
+        description=(
+            "Helper for merging a whole or partial repository and its history in a directory of another repo.\n"
+            "Repositories can be either local or remote ones. In case of the latter, it will be cloned."
+            "Every operation will be performed locally."
+        ),
+        epilog=(
+            "EXAMPLES\n\n\n"
+            "git_subtree_helper --source-branch main --source-repo A --dest-dir=X --dest-repo B --dest-branch feature\n"
+            "\tclone main branch of repo A and its history in folder X of repository B\n"
+            "git_subtree_helper --source-dir Y --source-branch main --source-repo A  --dest-dir=X --dest-repo B --dest-branch feature\n"
+            "\tclone folder Y in main branch of repo A in folder X of repository B (only the history of folder Y will be imported)"
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument("--source-repo", dest="source_repo_path", type=str, required=True)
     parser.add_argument("--source-branch", type=str, required=True)
