@@ -56,7 +56,7 @@ def create_branch_with_subtree(cfg: Config):
         "\n",
     ]
 
-def cleanup(cfg: Config, tmpdirs: List[str], script_location: str):
+def cleanup(tmpdirs: List[str], script_location: str):
     for tmpdir in tmpdirs:
         shutil.rmtree(tmpdir)
     os.remove(script_location)
@@ -111,7 +111,7 @@ def cli():
 
     subprocess.run(["/bin/bash", script_location], check=True)
 
-    cleanup(cfg, tmpdirs, script_location)
+    cleanup(tmpdirs, script_location)
 
 
 
