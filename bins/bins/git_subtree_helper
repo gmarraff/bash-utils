@@ -126,7 +126,5 @@ def cli():
     cleanup(tmpdirs, script_location)
 
 
-
-
 if __name__ == "__main__":
     cli()
