@@ -86,7 +86,7 @@ def cli():
             "Every operation will be performed locally."
         ),
         epilog=(
-            "EXAMPLES\n\n\n"
+            "EXAMPLES\n"
             "git_subtree_helper --source-branch main --source-repo A --dest-dir=X --dest-repo B --dest-branch feature\n"
             "\tclone main branch of repo A and its history in folder X of repository B\n"
             "git_subtree_helper --source-dir Y --source-branch main --source-repo A  --dest-dir=X --dest-repo B --dest-branch feature\n"
@@ -94,14 +94,14 @@ def cli():
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    parser.add_argument("--source-repo", dest="source_repo_path", type=str, required=True)
-    parser.add_argument("--source-branch", type=str, required=True)
-    parser.add_argument("--source-dir", type=str, default="")
-    parser.add_argument("--dest-repo", dest="dest_repo_path", type=str, required=True)
-    parser.add_argument("--dest-branch", type=str, required=True)
-    parser.add_argument("--dest-dir", type=str, required=True)
-    parser.add_argument("--dest-origin-branch", type=str, default="main")
-    parser.add_argument("--push", action="store_true")
+    parser.add_argument("--source-repo", dest="source_repo_path", type=str, required=True, help="Repository to be imported (remote or local)")
+    parser.add_argument("--source-branch", type=str, required=True, help="Branch of the source repo")
+    parser.add_argument("--source-dir", type=str, default="", help="Folder of the repo to import (leave blank to import the whole repo)")
+    parser.add_argument("--dest-repo", dest="dest_repo_path", type=str, required=True, help="Repository that will host the source repo (remote or local)")
+    parser.add_argument("--dest-branch", type=str, required=True, help="Branch to create in the destination repo to perform the operations")
+    parser.add_argument("--dest-dir", type=str, required=True, help="Directory of the destination repo where to import the source repo into")
+    parser.add_argument("--dest-origin-branch", type=str, default="main", help="Branch from where to create the operational branch in the destination repo (default: main)")
+    parser.add_argument("--push", action="store_true", help="Pushes the operational branch on the remote")
 
     args = parser.parse_args()
     cfg = Config(**vars(args))
