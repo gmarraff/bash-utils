@@ -25,6 +25,7 @@ function mark_deploy_file {
     fi
 
     docker run --rm \
+        --pull always \
         -v $PWD:/docs \
         kovetskiy/mark:latest \
             mark \
