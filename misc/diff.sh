@@ -1,3 +1,0 @@
-function localgitdiff() {
-    colordiff -burN $@
-}
