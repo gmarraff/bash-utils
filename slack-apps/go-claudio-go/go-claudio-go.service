@@ -1,0 +1,15 @@
+[Unit]
+Description=Go Claudio Go Slack app
+After=network-online.target
+
+[Service]
+EnvironmentFile=%h/.config/go-claudio-go/env
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONUNBUFFERED=1
+# install.sh replaces @APP@ with the path of app.py
+ExecStart=@APP@
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,15 @@
+display_information:
+  name: Go Claudio Go
+oauth_config:
+  scopes:
+    user:
+      - channels:history
+      - groups:history
+      - reactions:write
+      - users:read
+settings:
+  event_subscriptions:
+    user_events:
+      - message.channels
+      - message.groups
+  socket_mode_enabled: true

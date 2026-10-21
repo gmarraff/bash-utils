@@ -1,0 +1,65 @@
+#!/bin/bash
+
+usage() {
+  echo "Usage: $0 <list|start|stop> [instance-name]"
+  exit 1
+}
+
+[[ $# -lt 1 ]] && usage
+
+ACTION=$1
+NAME=$2
+
+if [[ "$ACTION" == "list" ]]; then
+  aws ec2 describe-instances \
+    --query "Reservations[].Instances[].{Name: Tags[?Key=='Name'] | [0].Value, Id: InstanceId, Status: State.Name, Tags: Tags}" \
+    --output json \
+  | jq -r '
+      ["NAME", "ID", "STATUS", "ALWAYSON"],
+      (.[] | [
+        (.Name // "N/A"),
+        .Id,
+        .State // .Status,
+        ((.Tags // []) | map(select(.Key=="AlwaysOn")) | first | .Value) // "-"
+      ])
+      | @tsv
+    ' \
+  | column -t 
+  exit 0
+fi
+
+if [[ "$ACTION" != "start" && "$ACTION" != "stop" ]]; then
+  echo "Error: action must be 'list', 'start', or 'stop'"
+  usage
+fi
+
+[[ $# -ne 2 ]] && usage
+
+# Look up instance ID(s) by Name tag
+INSTANCE_IDS=$(aws ec2 describe-instances \
+  --filters "Name=tag:Name,Values=$NAME" \
+  --query "Reservations[].Instances[?State.Name!='terminated'].InstanceId" \
+  --output text)
+
+if [[ -z "$INSTANCE_IDS" ]]; then
+  echo "Error: no active instances found with name '$NAME'"
+  exit 1
+fi
+
+# Confirm if multiple instances matched
+COUNT=$(echo "$INSTANCE_IDS" | wc -w | tr -d ' ')
+if [[ "$COUNT" -gt 1 ]]; then
+  echo "Warning: $COUNT instances matched '$NAME':"
+  echo "$INSTANCE_IDS" | tr '\t' '\n'
+  read -rp "Proceed with $ACTION on all of them? [y/N] " CONFIRM
+  [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]] && echo "Aborted." && exit 0
+fi
+
+# Execute action
+if [[ "$ACTION" == "start" ]]; then
+  aws ec2 start-instances --instance-ids $INSTANCE_IDS
+else
+  aws ec2 stop-instances --instance-ids $INSTANCE_IDS
+fi
+
+echo "Successfully triggered '$ACTION' on: $INSTANCE_IDS"
