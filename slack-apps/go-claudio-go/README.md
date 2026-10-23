@@ -16,7 +16,17 @@ Claudio! Bisio! Che simpatico umoristaaa!
 1. Go to <https://api.slack.com/apps> → **Create New App** → **From a manifest**, pick the workspace and paste [manifest.yml](manifest.yml).
 2. **Basic Information** → **App-Level Tokens** → **Generate Token and Scopes**, add the `connections:write` scope. Copy the `xapp-…` token.
 3. **Install App** → **Install to Workspace**. Copy the **User OAuth Token** (`xoxp-…`).
-4. Make sure the `:claudio:` custom emoji exists in the workspace (or set `GO_CLAUDIO_GO_EMOJI` to one that does), otherwise every reaction fails with `invalid_name`.
+4. Make sure the `:claudio:` custom emoji exists in the workspace (or set `GO_CLAUDIO_GO_EMOJI` to one that does), otherwise every reaction fails with `invalid_name`. See [Add the :claudio: emoji](#add-the-claudio-emoji).
+
+### Add the :claudio: emoji
+
+Use [bisio.png](bisio.png) as the emoji image:
+
+1. In Slack, open any message box and click the emoji button (or open the **Add Emoji** page at `https://<your-workspace>.slack.com/customize/emoji`).
+2. Click **Add Emoji** → **Upload Image** and select [bisio.png](bisio.png).
+3. Set the name to `claudio` (without the colons) and click **Save**.
+
+Slack resizes the image to 128x128px automatically. Admins may have restricted who can add custom emoji: if the option is missing, ask a workspace admin to upload it. To use a different name, set `GO_CLAUDIO_GO_EMOJI` to it.
 
 ## 2. Set the environment variables
 
