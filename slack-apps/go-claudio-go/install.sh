@@ -11,7 +11,7 @@ UNIT=go-claudio-go.service
 UNIT_FILE=$HOME/.config/systemd/user/$UNIT
 ENV_FILE=$HOME/.config/go-claudio-go/env
 REQUIRED_VARS="GO_CLAUDIO_GO_XAPP_TOKEN GO_CLAUDIO_GO_XOXP_TOKEN GO_CLAUDIO_GO_CLAUDE_USER_ID"
-OPTIONAL_VARS="GO_CLAUDIO_GO_EXCLUDED_CHANNELS GO_CLAUDIO_GO_EMOJI"
+OPTIONAL_VARS="GO_CLAUDIO_GO_EXCLUDED_CHANNELS GO_CLAUDIO_GO_EXCLUDED_CHANNEL_PREFIXES GO_CLAUDIO_GO_EMOJI"
 
 # systemd and Task Scheduler don't see the shell's environment, so persist
 # the variables to a file both setups load

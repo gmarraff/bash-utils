@@ -4,7 +4,9 @@ oauth_config:
   scopes:
     user:
       - channels:history
+      - channels:read
       - groups:history
+      - groups:read
       - reactions:write
       - users:read
 settings:

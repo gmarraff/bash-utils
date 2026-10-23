@@ -26,6 +26,7 @@ Claudio! Bisio! Che simpatico umoristaaa!
 | `GO_CLAUDIO_GO_XOXP_TOKEN` | `xoxp-…` token from step 1.3 |
 | `GO_CLAUDIO_GO_CLAUDE_USER_ID` | Claude's member ID, see below |
 | `GO_CLAUDIO_GO_EXCLUDED_CHANNELS` | Optional, channel IDs to ignore, e.g. `"C0123 C0456"` |
+| `GO_CLAUDIO_GO_EXCLUDED_CHANNEL_PREFIXES` | Optional, ignore channels whose name starts with one of these, e.g. `"ext shared-"` |
 | `GO_CLAUDIO_GO_EMOJI` | Optional, emoji name without the `:`, e.g. `bisio`. Defaults to `claudio` |
 
 **Claude's member ID**, once `GO_CLAUDIO_GO_XOXP_TOKEN` is set:
