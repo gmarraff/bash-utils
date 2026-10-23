@@ -1,8 +1,9 @@
 #!/bin/bash
-# Usage: ./install.sh systemd|windows|uninstall
+# Usage: ./install.sh systemd|windows|uninstall|clear-cache
 #   systemd: user service, for Linux hosts with systemd
 #   windows: Windows scheduled task that starts the app in WSL at logon
 #   uninstall: removes both, plus the saved variables and logs
+#   clear-cache: forgets the cached channel names and restarts the app
 # Installing one removes the other, so the app never runs twice.
 set -e
 
@@ -10,6 +11,7 @@ WORKDIR=$(cd "$(dirname "$BASH_SOURCE")" && pwd)
 UNIT=go-claudio-go.service
 UNIT_FILE=$HOME/.config/systemd/user/$UNIT
 ENV_FILE=$HOME/.config/go-claudio-go/env
+CACHE_DIR=$HOME/.cache/go-claudio-go
 REQUIRED_VARS="GO_CLAUDIO_GO_XAPP_TOKEN GO_CLAUDIO_GO_XOXP_TOKEN GO_CLAUDIO_GO_CLAUDE_USER_ID"
 OPTIONAL_VARS="GO_CLAUDIO_GO_EXCLUDED_CHANNELS GO_CLAUDIO_GO_EXCLUDED_CHANNEL_PREFIXES GO_CLAUDIO_GO_EMOJI"
 
@@ -90,12 +92,26 @@ uninstall() {
     remove_systemd
     remove_windows
     rm -rf "$(dirname "$ENV_FILE")" "$HOME/.local/state/go-claudio-go"
-    echo "Removed go-claudio-go, its saved variables and its logs"
+    echo "Removed go-claudio-go, its saved variables and logs (kept the cache)"
+}
+
+# The running app keeps the names in memory and would write them back, so
+# restart it after deleting the file
+clear_cache() {
+    rm -rf "$CACHE_DIR"
+    if [ -e "$UNIT_FILE" ]; then
+        systemctl --user restart "$UNIT"
+    elif command -v powershell.exe > /dev/null; then
+        kill_windows_app
+        windows_task -Restart
+    fi
+    echo "Cleared the channel name cache"
 }
 
 case "$1" in
     systemd) write_env_file; install_systemd ;;
     windows) write_env_file; install_windows ;;
     uninstall) uninstall ;;
-    *) echo "Usage: $0 systemd|windows|uninstall" >&2; exit 1 ;;
+    clear-cache) clear_cache ;;
+    *) echo "Usage: $0 systemd|windows|uninstall|clear-cache" >&2; exit 1 ;;
 esac

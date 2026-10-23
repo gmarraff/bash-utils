@@ -3,10 +3,12 @@
 #
 # Usage: .\register-task.ps1 -Distro Ubuntu -App /path/to/app.py
 #        .\register-task.ps1 -Remove
+#        .\register-task.ps1 -Restart
 param(
     [string]$Distro = "Ubuntu",
     [string]$App,
-    [switch]$Remove
+    [switch]$Remove,
+    [switch]$Restart
 )
 
 $ErrorActionPreference = "Stop"
@@ -17,6 +19,15 @@ if ($Remove) {
         Stop-ScheduledTask -TaskName $TaskName
         Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
         Write-Host "Removed scheduled task $TaskName"
+    }
+    exit
+}
+
+if ($Restart) {
+    if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue) {
+        Stop-ScheduledTask -TaskName $TaskName
+        Start-ScheduledTask -TaskName $TaskName
+        Write-Host "Restarted scheduled task $TaskName"
     }
     exit
 }
