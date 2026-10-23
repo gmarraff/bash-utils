@@ -35,6 +35,10 @@ EXCLUDED_CHANNEL_PREFIXES = tuple(os.getenv(f"{ENV_PREFIX}EXCLUDED_CHANNEL_PREFI
 
 app = App(token=XOXP_TOKEN)
 EMOJI = os.getenv(f"{ENV_PREFIX}EMOJI", "claudio")
+# delicate: only @Claude mentions, ballistic: also Claude named in plain text
+MODE = os.getenv(f"{ENV_PREFIX}MODE", "delicate")
+if MODE not in ("delicate", "ballistic"):
+    raise RuntimeError(f"{ENV_PREFIX}MODE must be delicate or ballistic, not {MODE!r}")
 
 # Claud, Claude, Claudio and Claudione, with any letter stretched out
 # (clauddddd, claudeeee, claudioneeee)
@@ -44,10 +48,11 @@ def message_mention_claude(event):
     text = event.get("text", "")
     # Blocks may carry content missing from text, so search them too
     blocks = str(event.get("blocks", ""))
-    # @Claude mentions only carry the app's bot user ID, never its name
+    # @Claude mentions, including the "Sent using @Claude" footer, only carry
+    # the app's bot user ID, never its name
     if CLAUDE_USER_ID in text or CLAUDE_USER_ID in blocks:
         return True
-    return bool(CLAUDE_RE.search(text) or CLAUDE_RE.search(blocks))
+    return MODE == "ballistic" and bool(CLAUDE_RE.search(text) or CLAUDE_RE.search(blocks))
 
 CHANNEL_CACHE = Path.home() / ".cache" / "go-claudio-go" / "channels.json"
 try:
@@ -92,4 +97,5 @@ def tag_claude_posts(event, client):
                 raise
 
 if __name__ == "__main__":
+    print(f"{datetime.now().isoformat(timespec='seconds')} Bisio is starting in {MODE} mode")
     SocketModeHandler(app, XAPP_TOKEN).start()

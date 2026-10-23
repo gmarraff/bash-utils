@@ -7,7 +7,7 @@ The Official Slack App of the Simpatico Umorista.
 
 Give your colleagues a boost when responding to channels with automated Claude workflows.
 
-Reacts with `:claudio:` to every Slack message that mentions Claude (by name or `@Claude`).
+Reacts with `:claudio:` to every Slack message that mentions `@Claude`, including the ones sent through Claude with the *Sent using @Claude* footer.
 
 Claudio! Bisio! Che simpatico umoristaaa!
 
@@ -28,6 +28,7 @@ Claudio! Bisio! Che simpatico umoristaaa!
 | `GO_CLAUDIO_GO_EXCLUDED_CHANNELS` | Optional, channel IDs to ignore, e.g. `"C0123 C0456"` |
 | `GO_CLAUDIO_GO_EXCLUDED_CHANNEL_PREFIXES` | Optional, ignore channels whose name starts with one of these, e.g. `"ext shared-"` |
 | `GO_CLAUDIO_GO_EMOJI` | Optional, emoji name without the `:`, e.g. `bisio`. Defaults to `claudio` |
+| `GO_CLAUDIO_GO_MODE` | Optional, `delicate` (default) or `ballistic`, see [Go Ballistic](#go-ballistic) |
 
 **Claude's member ID**, once `GO_CLAUDIO_GO_XOXP_TOKEN` is set:
 
@@ -56,3 +57,16 @@ make clear-cache   # forget cached channel names (e.g. after renaming a channel)
 make uninstall     # remove both setups, the saved variables and the logs
 make reinstall     # uninstall, then install the same setup again
 ```
+
+## Go Ballistic
+
+*Unleash the full power of the simpatico umorista!*
+
+In ballistic mode Bisio also reacts when Claude is just named in plain text: `claud`, `claudeee`, `claudio`, `claudioneeee`, any way you stretch it.
+
+```bash
+make ballistic   # go ballistic
+make delicate    # calm down, back to @Claude mentions only
+```
+
+Both update the saved variables and restart the app. The choice sticks across `make reinstall` and re-running `make systemd`/`make windows`, unless `GO_CLAUDIO_GO_MODE` is set in your shell, which then wins.

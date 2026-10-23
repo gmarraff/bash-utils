@@ -1,10 +1,11 @@
 #!/bin/bash
-# Usage: ./install.sh systemd|windows|uninstall|reinstall|clear-cache
+# Usage: ./install.sh systemd|windows|uninstall|reinstall|clear-cache|delicate|ballistic
 #   systemd: user service, for Linux hosts with systemd
 #   windows: Windows scheduled task that starts the app in WSL at logon
 #   uninstall: removes both, plus the saved variables and logs
 #   reinstall: uninstall, then install the same setup again
 #   clear-cache: forgets the cached channel names and restarts the app
+#   delicate|ballistic: switches the installed app to that mode and restarts it
 # Installing one removes the other, so the app never runs twice.
 set -e
 
@@ -14,7 +15,11 @@ UNIT_FILE=$HOME/.config/systemd/user/$UNIT
 ENV_FILE=$HOME/.config/go-claudio-go/env
 CACHE_DIR=$HOME/.cache/go-claudio-go
 REQUIRED_VARS="GO_CLAUDIO_GO_XAPP_TOKEN GO_CLAUDIO_GO_XOXP_TOKEN GO_CLAUDIO_GO_CLAUDE_USER_ID"
-OPTIONAL_VARS="GO_CLAUDIO_GO_EXCLUDED_CHANNELS GO_CLAUDIO_GO_EXCLUDED_CHANNEL_PREFIXES GO_CLAUDIO_GO_EMOJI"
+OPTIONAL_VARS="GO_CLAUDIO_GO_EXCLUDED_CHANNELS GO_CLAUDIO_GO_EXCLUDED_CHANNEL_PREFIXES GO_CLAUDIO_GO_EMOJI GO_CLAUDIO_GO_MODE"
+
+# Keep the mode picked with delicate|ballistic when the shell doesn't set one,
+# read now since uninstall (and so reinstall) deletes the file
+GO_CLAUDIO_GO_MODE=${GO_CLAUDIO_GO_MODE:-$(sed -n 's/^GO_CLAUDIO_GO_MODE="\(.*\)"$/\1/p' "$ENV_FILE" 2>/dev/null || true)}
 
 check_env() {
     local var missing=""
@@ -25,6 +30,10 @@ check_env() {
         echo "Set these environment variables first:$missing" >&2
         exit 1
     fi
+    case "$GO_CLAUDIO_GO_MODE" in
+        ""|delicate|ballistic) ;;
+        *) echo "GO_CLAUDIO_GO_MODE must be delicate or ballistic, not $GO_CLAUDIO_GO_MODE" >&2; exit 1 ;;
+    esac
 }
 
 # systemd and Task Scheduler don't see the shell's environment, so persist
@@ -118,17 +127,32 @@ reinstall() {
     install_$setup
 }
 
-# The running app keeps the names in memory and would write them back, so
-# restart it after deleting the file
-clear_cache() {
-    rm -rf "$CACHE_DIR"
+restart_app() {
     if [ -e "$UNIT_FILE" ]; then
         systemctl --user restart "$UNIT"
     elif command -v powershell.exe > /dev/null; then
         kill_windows_app
         windows_task -Restart
     fi
+}
+
+# The running app keeps the names in memory and would write them back, so
+# restart it after deleting the file
+clear_cache() {
+    rm -rf "$CACHE_DIR"
+    restart_app
     echo "Cleared the channel name cache"
+}
+
+set_mode() {
+    if [ ! -e "$ENV_FILE" ]; then
+        echo "Nothing installed, use systemd or windows instead" >&2
+        exit 1
+    fi
+    sed -i '/^GO_CLAUDIO_GO_MODE=/d' "$ENV_FILE"
+    echo "GO_CLAUDIO_GO_MODE=\"$1\"" >> "$ENV_FILE"
+    restart_app
+    echo "Bisio is now $1"
 }
 
 case "$1" in
@@ -137,5 +161,6 @@ case "$1" in
     uninstall) uninstall ;;
     reinstall) reinstall ;;
     clear-cache) clear_cache ;;
-    *) echo "Usage: $0 systemd|windows|uninstall|reinstall|clear-cache" >&2; exit 1 ;;
+    delicate|ballistic) set_mode "$1" ;;
+    *) echo "Usage: $0 systemd|windows|uninstall|reinstall|clear-cache|delicate|ballistic" >&2; exit 1 ;;
 esac
