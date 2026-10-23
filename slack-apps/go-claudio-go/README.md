@@ -42,12 +42,17 @@ curl -s -H "Authorization: Bearer $GO_CLAUDIO_GO_XOXP_TOKEN" \
 ## 3. Install
 
 ```bash
-./install.sh windows   # WSL: Windows scheduled task, starts at Windows logon
-./install.sh systemd   # Linux: systemd user service, starts at login
+make windows   # WSL: Windows scheduled task, starts at Windows logon
+make systemd   # Linux: systemd user service, starts at login
 ```
 
 This starts the app right away and copies the variables to `~/.config/go-claudio-go/env`, since background services can't see your shell's variables. Re-run it after changing any of them.
 
-Logs: `~/.local/state/go-claudio-go/app.log` (windows) or `journalctl --user -u go-claudio-go -f` (systemd).
+Other commands:
 
-To remove everything (both setups, the saved variables and the logs): `./install.sh uninstall`
+```bash
+make logs          # follow the logs
+make clear-cache   # forget cached channel names (e.g. after renaming a channel)
+make uninstall     # remove both setups, the saved variables and the logs
+make reinstall     # uninstall, then install the same setup again
+```
