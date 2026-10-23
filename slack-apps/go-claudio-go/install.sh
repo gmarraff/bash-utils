@@ -1,8 +1,9 @@
 #!/bin/bash
-# Usage: ./install.sh systemd|windows|uninstall|clear-cache
+# Usage: ./install.sh systemd|windows|uninstall|reinstall|clear-cache
 #   systemd: user service, for Linux hosts with systemd
 #   windows: Windows scheduled task that starts the app in WSL at logon
 #   uninstall: removes both, plus the saved variables and logs
+#   reinstall: uninstall, then install the same setup again
 #   clear-cache: forgets the cached channel names and restarts the app
 # Installing one removes the other, so the app never runs twice.
 set -e
@@ -15,9 +16,7 @@ CACHE_DIR=$HOME/.cache/go-claudio-go
 REQUIRED_VARS="GO_CLAUDIO_GO_XAPP_TOKEN GO_CLAUDIO_GO_XOXP_TOKEN GO_CLAUDIO_GO_CLAUDE_USER_ID"
 OPTIONAL_VARS="GO_CLAUDIO_GO_EXCLUDED_CHANNELS GO_CLAUDIO_GO_EXCLUDED_CHANNEL_PREFIXES GO_CLAUDIO_GO_EMOJI"
 
-# systemd and Task Scheduler don't see the shell's environment, so persist
-# the variables to a file both setups load
-write_env_file() {
+check_env() {
     local var missing=""
     for var in $REQUIRED_VARS; do
         [ -n "${!var}" ] || missing="$missing $var"
@@ -26,6 +25,12 @@ write_env_file() {
         echo "Set these environment variables first:$missing" >&2
         exit 1
     fi
+}
+
+# systemd and Task Scheduler don't see the shell's environment, so persist
+# the variables to a file both setups load
+write_env_file() {
+    check_env
     mkdir -p "$(dirname "$ENV_FILE")"
     touch "$ENV_FILE"
     chmod 600 "$ENV_FILE"
@@ -95,6 +100,24 @@ uninstall() {
     echo "Removed go-claudio-go, its saved variables and logs (kept the cache)"
 }
 
+reinstall() {
+    local setup
+    if [ -e "$UNIT_FILE" ]; then
+        setup=systemd
+    elif command -v powershell.exe > /dev/null && powershell.exe -NoProfile -Command \
+        "if (-not (Get-ScheduledTask -TaskName GoClaudioGo -ErrorAction SilentlyContinue)) { exit 1 }"; then
+        setup=windows
+    else
+        echo "Nothing installed, use systemd or windows instead" >&2
+        exit 1
+    fi
+    # Check before uninstalling, so a missing variable doesn't leave it removed
+    check_env
+    uninstall
+    write_env_file
+    install_$setup
+}
+
 # The running app keeps the names in memory and would write them back, so
 # restart it after deleting the file
 clear_cache() {
@@ -112,6 +135,7 @@ case "$1" in
     systemd) write_env_file; install_systemd ;;
     windows) write_env_file; install_windows ;;
     uninstall) uninstall ;;
+    reinstall) reinstall ;;
     clear-cache) clear_cache ;;
-    *) echo "Usage: $0 systemd|windows|uninstall|clear-cache" >&2; exit 1 ;;
+    *) echo "Usage: $0 systemd|windows|uninstall|reinstall|clear-cache" >&2; exit 1 ;;
 esac
