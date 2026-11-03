@@ -76,7 +76,7 @@ In ballistic mode Bisio also reacts when Claude is just named in plain text: `cl
 
 ```bash
 make ballistic   # go ballistic
-make delicate    # calm down, back to @Claude mentions only
+make delicate    # calm down, back to @Claude mentions and "Claudio" only
 ```
 
 Both update the saved variables and restart the app. The choice sticks across `make reinstall` and re-running `make systemd`/`make windows`, unless `GO_CLAUDIO_GO_MODE` is set in your shell, which then wins.

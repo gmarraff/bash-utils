@@ -35,7 +35,7 @@ EXCLUDED_CHANNEL_PREFIXES = tuple(os.getenv(f"{ENV_PREFIX}EXCLUDED_CHANNEL_PREFI
 
 app = App(token=XOXP_TOKEN)
 EMOJI = os.getenv(f"{ENV_PREFIX}EMOJI", "claudio")
-# delicate: only @Claude mentions, ballistic: also Claude named in plain text
+# delicate: @Claude mentions and the exact word Claudio, ballistic: also Claude named in plain text
 MODE = os.getenv(f"{ENV_PREFIX}MODE", "delicate")
 if MODE not in ("delicate", "ballistic"):
     raise RuntimeError(f"{ENV_PREFIX}MODE must be delicate or ballistic, not {MODE!r}")
@@ -44,6 +44,9 @@ if MODE not in ("delicate", "ballistic"):
 # (clauddddd, claudeeee, claudioneeee)
 CLAUDE_RE = re.compile(r"\bc+l+a+u+d+(?:e+|i+o+(?:n+e+)?)?\b", re.IGNORECASE)
 
+# Delicate mode only reacts to this exact spelling, case sensitive
+CLAUDIO_RE = re.compile(r"\bClaudio\b")
+
 def message_mention_claude(event):
     text = event.get("text", "")
     # Blocks may carry content missing from text, so search them too
@@ -51,6 +54,8 @@ def message_mention_claude(event):
     # @Claude mentions, including the "Sent using @Claude" footer, only carry
     # the app's bot user ID, never its name
     if CLAUDE_USER_ID in text or CLAUDE_USER_ID in blocks:
+        return True
+    if CLAUDIO_RE.search(text) or CLAUDIO_RE.search(blocks):
         return True
     return MODE == "ballistic" and bool(CLAUDE_RE.search(text) or CLAUDE_RE.search(blocks))
 
